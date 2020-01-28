@@ -77,8 +77,6 @@ def list_resources():
 @login_required
 def create_resource():
     form = CreateResourceForm()
-    print('------ {0}'.format(request.form))
-    print(form.validate_on_submit())
     if form.validate_on_submit():
         print(form)
         print(form.name.data)
@@ -91,12 +89,63 @@ def create_resource():
             flash('Resource added.')
         except:
             flash('error adding resource. :(')
-        return redirect(url_for('main.user', username=current_user.username))
+        return redirect(url_for('main.list_resources'))
     elif request.method == 'GET':
         #load editing data into form
         pass
     return render_template('create_resource.html', title='Add a bookable resource',
                            form=form)
+
+
+@bp.route('/resources/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_resource(id):
+    """
+    Edit a resource
+    """
+    #check_admin()
+
+    #add_department = False
+
+    resource = Resource.query.get_or_404(id)
+    #form = CreateResourceForm(obj=resource)
+    form = CreateResourceForm()
+    print(form)
+    if form.validate_on_submit():
+        resource.name = form.name.data
+        resource.description = form.description.data
+        db.session.commit()
+        flash('You have successfully edited the resource.')
+
+        # redirect to the resource page
+        return redirect(url_for('main.list_resources'))
+
+    form.description.data = resource.description
+    form.name.data = resource.name
+
+    #return render_template('create_resource.html', resource=resource, title='Resources', user=current_user)
+    return render_template('create_resource.html', title='Edit a bookable resource',form=form)
+
+
+
+@bp.route('/resources/delete/<int:id>', methods=['GET', 'POST'])
+@login_required
+def delete_resource(id):
+    """
+    Delete a resource from the database
+    """
+    #check_admin()
+    try:
+        resource = Resource.query.get_or_404(id)
+        db.session.delete(resource)
+        db.session.commit()
+        flash('You have successfully deleted the resource.')
+
+    except:
+        flash('error deleting resource. :(')   
+
+    # redirect to the resources page
+    return redirect(url_for('main.list_resources'))
 
 
 @bp.route('/follow/<username>')

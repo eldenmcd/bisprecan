@@ -9,8 +9,9 @@
             </td>
         </tr>
     </table>
+    <table class="table table-hover">
     {% for resource in resources %}
-        <table class="table table-hover">
+       
         <tr>
             <td>
                 {{ resource.name }}
@@ -18,9 +19,14 @@
             <td>
                 {{ resource.description }}
             </td>
+            <td><a href="{{url_for('main.edit_resource', id=resource.id) }}"> edit </a>
+            </td>
+            <td><a href="{{url_for('main.delete_resource', id=resource.id) }}"> delete </a>
+            </td>
         </tr>
+    {% endfor %}    
     </table>
-    {% endfor %}
+   
     <p><a href="{{ url_for('main.create_resource', username=user.username) }}">Add resource</a></p>
    
 {% endblock %}
